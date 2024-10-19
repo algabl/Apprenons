@@ -14,8 +14,8 @@
             filePath = "Apprenons/Model/FrenchLessonPlan.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
             landmarkName = "updateProgress(for:keyPath:value:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -56,46 +56,64 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "56CF4A99-B9DB-4360-8606-DACA8EF5A2F9"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Apprenons/Model/FrenchLessonPlan.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
             landmarkName = "init()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "56CF4A99-B9DB-4360-8606-DACA8EF5A2F9 - c63294d602c1c702"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Apprenons.FrenchLessonPlan.init() -&gt; Apprenons.FrenchLessonPlan"
-                  moduleName = "Apprenons.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/alexanderblack/Documents/source/repos/Apprenons/Apprenons/Model/FrenchLessonPlan.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "69"
-                  endingLineNumber = "69">
-               </Location>
-               <Location
-                  uuid = "56CF4A99-B9DB-4360-8606-DACA8EF5A2F9 - d56c5c4d4e2ae2e5"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Apprenons.Topic) -&gt; Apprenons.Progress in Apprenons.FrenchLessonPlan.init() -&gt; Apprenons.FrenchLessonPlan"
-                  moduleName = "Apprenons.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/alexanderblack/Documents/source/repos/Apprenons/Apprenons/Model/FrenchLessonPlan.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "70"
-                  endingLineNumber = "70">
-               </Location>
-            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "341E6569-A72E-4C32-B3D8-0D984AF0BCB2"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Apprenons/View/FlashcardsView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6C21B1A5-DA17-47CB-AA69-73E2E9B2F285"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Apprenons/View/QuizView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "52402E9C-3DB7-4DE0-B89C-C6E1DD6F6434"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Apprenons/View/QuizView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
+            landmarkName = "body"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

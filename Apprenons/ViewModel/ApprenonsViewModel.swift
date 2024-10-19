@@ -32,6 +32,18 @@ import Foundation
         model.progress
     }
     
+    func topic(withID id: Int) -> Topic? {
+        return model.topics.first(where: { $0.id == id })
+    }
+    
+    func isFaceUp(_ flashcard: Flashcard, in topic: Topic) -> Bool {
+        guard let topic = model.topics.first(where: { $0.id == topic.id }) else { return true }
+        guard let flashcard = topic.flashcardList.first(where: { $0.id == flashcard.id }) else { return true }
+        
+        return flashcard.isFaceUp
+    }
+    
+
     
     
     // MARK: - User intents
@@ -49,6 +61,17 @@ import Foundation
         model.flip(flashcard, in: topic )
     }
     
+    func handleQuizAnswer(_ answer: String, in quizItem: QuizItem) -> String {
+        if answer.lowercased() == quizItem.correctAnswer {
+            return "Correct!"
+        }
+        return "Incorrect :("
+    }
+    
+    func resetFlashcards(in topic: Topic) {
+        guard let topicIndex = topics.firstIndex(where: { $0.id == topic.id }) else { return }
+        model.resetFlashcards(for: topicIndex)
+    }
     
     // MARK: - Private helpers
 }
