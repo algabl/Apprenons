@@ -13,18 +13,21 @@ struct Constants {
 }
 
 struct FlashcardsView: View {
-    let topic: Topic
-    let viewModel: ApprenonsViewModel
-    
+    let topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
+
     @State private var isFlashcardStudied = false
     @State private var shuffledFlashcards: [Flashcard] = []
 
+    var topic: Topic? {
+        viewModel.topic(withID: topicID)
+    }
     
     var body: some View {
         VStack {
             TabView {
-                ForEach(Array(shuffledFlashcards)) { flashcard in
-                    FlashcardView(flashcard: flashcard, topic: topic, viewModel: viewModel)
+                ForEach(shuffledFlashcards) { flashcard in
+                    FlashcardView(flashcardID: flashcard.id, topicID: topicID)
                 }
               
             }
@@ -33,46 +36,53 @@ struct FlashcardsView: View {
           
             Toggle("Mark as Studied", isOn: $isFlashcardStudied)
                 .onChange(of: isFlashcardStudied) {
-                    viewModel.updateProgress(for: topic, keyPath: \.flashcardStudied, value: isFlashcardStudied)
+                    viewModel.updateProgress(for: topicID, keyPath: \.flashcardStudied, value: isFlashcardStudied)
             }
         }
         .padding()
         .onAppear {
-            if let progress = viewModel.progress.first(where: { $0.topicID == topic.id }) {
+            if let progress = viewModel.progress.first(where: { $0.topicID == topicID }) {
                 isFlashcardStudied = progress.flashcardStudied
             }
-            shuffledFlashcards = topic.flashcardList.shuffled()
+            shuffledFlashcards = topic?.flashcardList.shuffled() ?? []
         }
         .onDisappear {
-            viewModel.resetFlashcards(in: topic)
+            viewModel.resetFlashcards(in: topicID)
         }
     }
 }
 
 struct FlashcardView: View {
-    let flashcard: Flashcard
-    var topic: Topic
-    let viewModel: ApprenonsViewModel
+    let flashcardID: UUID
+    var topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
+    
+    var flashcard: Flashcard? {
+        viewModel.flashcard(withID: flashcardID, in: topicID)
+    }
     
     var body: some View {
         ZStack {
             Group {
-                if viewModel.isFaceUp(flashcard, in: topic) {
-                    RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
-                    RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
-                    Text(flashcard.front)
-                        .font(.largeTitle)
-                } else {
-                    RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
-                    RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
-                    Text(flashcard.back)
-                        .font(.largeTitle)
+                if let flashcard {
+                    if flashcard.isFaceUp {
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
+                        Text(flashcard.front)
+                            .font(.largeTitle)
+                    } else {
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
+                        Text(flashcard.back)
+                            .font(.largeTitle)
+                    }
                 }
+           
             }
            
         }
         .onTapGesture {
-            viewModel.flip(flashcard, in: topic)
+            viewModel.flip(flashcardID, in: topicID)
         }
         .navigationTitle("Flashcards")
         .navigationBarTitleDisplayMode(.inline)
@@ -83,6 +93,6 @@ struct FlashcardView: View {
 
 #Preview {
     NavigationStack {
-        FlashcardsView(topic: FrenchLessonPlan.staticTopics[0], viewModel: ApprenonsViewModel())
+        FlashcardsView(topicID: FrenchLessonPlan.staticTopics[0].id)
     }
 }

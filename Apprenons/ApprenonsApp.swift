@@ -11,7 +11,8 @@ import SwiftUI
 struct ApprenonsApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView(viewModel: ApprenonsViewModel())
+            MainView()
+                .environmentObject(ApprenonsViewModel())
         }
     }
 }

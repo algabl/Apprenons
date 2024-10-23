@@ -8,45 +8,52 @@
 import SwiftUI
 
 struct LessonView: View {
-    let topic: Topic
-    var viewModel: ApprenonsViewModel
+    let topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
     @State private var isLessonRead = false
     @State private var isQuizPassed = false
+    
+    var topic: Topic? {
+        viewModel.topic(withID: topicID)
+    }
+    
     var body: some View {
         VStack {
-            Toggle("Mark as Read", isOn: $isLessonRead)
-                           .onChange(of: isLessonRead) {
-                               viewModel.updateProgress(for: topic, keyPath: \.lessonRead, value: isLessonRead)
-                           }
-            Text(topic.lessonText)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer()
-            NavigationLink {
-                QuizView(quiz: topic.quiz, viewModel: viewModel)
-            } label: {
-                Text("\(topic.title) Quiz")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
-            NavigationLink {
-                FlashcardsView(topic: topic, viewModel: viewModel)
-            } label: {
-                Text("\(topic.title) Flashcards")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+            if let topic {
+                Toggle("Mark as Read", isOn: $isLessonRead)
+                               .onChange(of: isLessonRead) {
+                                   viewModel.updateProgress(for: topicID, keyPath: \.lessonRead, value: isLessonRead)
+                               }
+                Text(topic.lessonText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer()
+                NavigationLink {
+                    QuizView(topicID: topicID)
+                } label: {
+                    Text("\(topic.title) Quiz")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                NavigationLink {
+                    FlashcardsView(topicID: topicID)
+                } label: {
+                    Text("\(topic.title) Flashcards")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
         }
-        .navigationTitle(topic.title)
+        .navigationTitle(topic?.title ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if let progress = viewModel.progress.first(where: { $0.topicID == topic.id }) {
+            if let progress = viewModel.progress.first(where: { $0.topicID == topicID }) {
                          isLessonRead = progress.lessonRead
                          isQuizPassed = progress.quizPassed
-                     }
+                 }
         }
         .padding()
     }
@@ -54,6 +61,6 @@ struct LessonView: View {
 
 #Preview {
     NavigationStack {
-        LessonView(topic: FrenchLessonPlan.staticTopics[0], viewModel: ApprenonsViewModel())
+        LessonView(topicID: FrenchLessonPlan.staticTopics[0].id)
     }
 }

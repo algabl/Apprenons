@@ -8,39 +8,48 @@
 import SwiftUI
 
 struct MainView: View {
-    
-    let viewModel: ApprenonsViewModel
+    @EnvironmentObject var viewModel: ApprenonsViewModel
     
     var body: some View {
         TabView {
-            Tab("Topics", systemImage: "lightbulb") {
-                NavigationStack {
-                    List(viewModel.topics) { topic in
-                        TopicCell(topic: topic, viewModel: viewModel)
-                    }
-                    .navigationTitle("Apprenons")
+            TopicsView()
+                .tabItem {
+                    Label("Topics", systemImage: "lightbulb")
                 }
-            }
         }
+    }
+}
+
+struct TopicsView: View {
+    @EnvironmentObject var viewModel: ApprenonsViewModel
     
+    var body: some View {
+        NavigationStack {
+            List(viewModel.topics) { topic in
+                TopicCell(topicID: topic.id)
+            }
+            .navigationTitle("Apprenons")
+        }
     }
 }
 
 struct TopicCell: View {
-    let topic: Topic
-    var viewModel: ApprenonsViewModel
-    
+    let topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
+
     var body: some View {
         HStack {
             NavigationLink {
-                LessonView(topic: topic, viewModel: viewModel)
+                LessonView(topicID: topicID)
             } label: {
-                Text(topic.title)
+                if let title = viewModel.topic(withID: topicID)?.title {
+                    Text(title)
+                }
             }
         }
     }
 }
 
 #Preview {
-    MainView(viewModel: ApprenonsViewModel())
+    MainView()
 }

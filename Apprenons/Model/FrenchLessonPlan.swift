@@ -12,18 +12,19 @@ protocol LessonPlan {
     static var staticTopics: [Topic] { get }
     var topics: [Topic] { get set }
     var progress: [Progress] { get set }
-    mutating func updateProgress<T>(for topic: Topic, keyPath: WritableKeyPath<Progress, T>, value: T)
-    mutating func flip(_ flashcard: Flashcard, in topic: Topic)
+    mutating func updateProgress<T>(for topicID: UUID, keyPath: WritableKeyPath<Progress, T>, value: T)
+    mutating func flip(_ flashcardID: UUID, in topicID: UUID)
     mutating func resetFlashcards(for topicIndex: Int)
+    mutating func setQuizScore(_ score: Int, for topic: Topic)
 }
 
 struct Topic: Identifiable {
-    let id: Int
+    let id: UUID = UUID()
     let title: String
     let lessonText: String
     var flashcardList: [Flashcard]
-    let quiz: [QuizItem]
-    var quizScore: Int = 0
+    var quiz: [QuizItem]
+    var quizScore: Int?
 }
 
 struct Flashcard: Identifiable {
@@ -44,6 +45,7 @@ struct QuizItem: Identifiable {
         let answers: [String]?
         let correctAnswer: String
         let questionType: QuestionType
+        var answered: Bool = false
 }
 
 struct FrenchLessonPlan: LessonPlan {
@@ -56,22 +58,21 @@ struct FrenchLessonPlan: LessonPlan {
     var languageName: String = "French"
     
     static var staticTopics: [Topic] = [Topic(
-        id: 0,
         title: "Basic Greetings and Farewells",
         lessonText: "Some helpful content",
         flashcardList: [Flashcard(front: "Hello", back: "Bonjour"), Flashcard(front: "Goodbye", back: "Au revoir"), Flashcard(front: "Hi", back: "Salut"), Flashcard(front: "How are you?", back: "Comment allez-vous?")],
         quiz: [
             QuizItem(
-            question: "What is the French word for 'Hello'?",
-            answers: ["Bonjour", "Salut", "Oui", "Non"],
-            correctAnswer: "bonjour",
-            questionType: .multipleChoice
+                question: "What is the French word for 'Hello'?",
+                answers: ["Bonjour", "Salut", "Oui", "Non"],
+                correctAnswer: "bonjour",
+                questionType: .multipleChoice
             ),
             QuizItem(
-            question: "What does 'Oui' mean?",
-            answers: nil,
-            correctAnswer: "yes",
-            questionType: .multipleChoice
+                question: "What does 'Oui' mean?",
+                answers: nil,
+                correctAnswer: "yes",
+                questionType: .multipleChoice
             ),
         ]
     )]
@@ -91,9 +92,9 @@ struct FrenchLessonPlan: LessonPlan {
     
     // MARK: - Helpers
     
-    mutating func flip(_ flashcard: Flashcard, in topic: Topic) {
-        guard let topicIndex = topics.firstIndex(where: { $0.id == topic.id }) else { return }
-        guard let flashcardIndex = topics[topicIndex].flashcardList.firstIndex(where: { $0.id == flashcard.id }) else { return }
+    mutating func flip(_ flashcardID: UUID, in topicID: UUID) {
+        guard let topicIndex = topics.firstIndex(where: { $0.id == topicID }) else { return }
+        guard let flashcardIndex = topics[topicIndex].flashcardList.firstIndex(where: { $0.id == flashcardID }) else { return }
 
         topics[topicIndex].flashcardList[flashcardIndex].isFaceUp.toggle()
     }
@@ -110,10 +111,23 @@ struct FrenchLessonPlan: LessonPlan {
     }
     
     // Generic function to update a specific property on a Progress object
-    mutating func updateProgress<T>(for topic: Topic, keyPath: WritableKeyPath<Progress, T>, value: T) {
-        if let index = progress.firstIndex(where: { $0.topicID == topic.id }) {
+    mutating func updateProgress<T>(for topicID: UUID, keyPath: WritableKeyPath<Progress, T>, value: T) {
+        if let index = progress.firstIndex(where: { $0.topicID == topicID }) {
             progress[index][keyPath: keyPath] = value
         }
+    }
+    
+    mutating func setQuizScore(_ score: Int, for topic: Topic) {
+        if let index = topics.firstIndex(where: { $0.id == topic.id }) {
+            topics[index].quizScore = score
+        }
+    }
+    
+    mutating func setAnswered(_ answered: Bool, for quizItem: QuizItem, in topic: Topic) {
+        guard let index = topics.firstIndex(where: { $0.id == topic.id }) else { return }
+        guard let quizItemIndex = topics[index].quiz.firstIndex(where:  { $0.id == topic.quiz[index].id }) else { return }
+        
+        topics[index].quiz[quizItemIndex].answered = answered
     }
             
     // MARK: - Private helpers

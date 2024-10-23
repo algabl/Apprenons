@@ -8,16 +8,23 @@
 import SwiftUI
 
 struct QuizView: View {
-    let quiz: [QuizItem]
-    let viewModel: ApprenonsViewModel
+    let topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
     
+    var topic: Topic? {
+        viewModel.topic(withID: topicID)
+    }
+    
+    var quiz: [QuizItem] {
+        topic?.quiz ?? []
+    }
     @State private var currentQuizItemIndex: Int = 0
     
     var body: some View {
         VStack {
             TabView(selection: $currentQuizItemIndex) {
                 ForEach(quiz.indices, id: \.self) { index in
-                    QuizItemView(quizItem: quiz[index], viewModel: viewModel, currentQuizItemIndex: $currentQuizItemIndex)
+                    QuizItemView(quizItemID: quiz[index].id, topicID: topicID, currentQuizItemIndex: $currentQuizItemIndex)
                     .tag(index)
                     .disabled(currentQuizItemIndex != index)
                 }
@@ -30,38 +37,51 @@ struct QuizView: View {
 }
 
 struct QuizItemView: View {
-    let quizItem: QuizItem
-    let viewModel: ApprenonsViewModel
+    let quizItemID: UUID
+    let topicID: UUID
+    @EnvironmentObject var viewModel: ApprenonsViewModel
     @State private var response: String = ""
     @State private var feedback: String?
     @Binding var currentQuizItemIndex: Int
+    
+    var topic: Topic? {
+        viewModel.topic(withID: topicID)
+    }
+    
+    var quizItem: QuizItem? {
+        topic?.quiz.first(where: { $0.id == quizItemID })
+    }
     var body: some View {
         VStack {
-            Form {
-                Text(quizItem.question)
-                    .font(.headline)
-                    .padding()
-                if let answers = quizItem.answers {
-                    ForEach (answers, id: \.self) { answer in
-                        Text(answer)
-                            .onTapGesture {
-                                feedback = viewModel.handleQuizAnswer(answer, in: quizItem)
+            if let topic, let quizItem {
+                Text("Score: \(topic.quizScore)")
+                Form {
+                    Text(quizItem.question)
+                        .font(.headline)
+                        .padding()
+                    if let answers = quizItem.answers {
+                        ForEach (answers, id: \.self) { answer in
+                            Text(answer)
+                                .onTapGesture {
+                                    feedback = viewModel.handleQuizAnswer(answer, for: quizItem, in: topic)
+                                }
+                        }
+                    } else {
+                        TextField("Enter your response here", text: $response)
+                            .onSubmit {
+                                feedback = viewModel.handleQuizAnswer(response, for: quizItem, in: topic)
                             }
                     }
-                } else {
-                    TextField("Enter your response here", text: $response)
-                        .onSubmit {
-                            feedback = viewModel.handleQuizAnswer(response, in: quizItem)
-                        }
+                }
+                if let feedback {
+                    Text(feedback)
+                    Button("Next Question") {
+                        currentQuizItemIndex += 1
+                    }
+                    .padding()
                 }
             }
-            if let feedback {
-                Text(feedback)
-                Button("Next Question") {
-                    currentQuizItemIndex += 1
-                }
-                .padding()
-            }
+
 
         }
 
@@ -69,5 +89,5 @@ struct QuizItemView: View {
 }
 
 #Preview {
-    QuizView(quiz: FrenchLessonPlan.staticTopics[0].quiz, viewModel: ApprenonsViewModel())
+    QuizView(topicID: FrenchLessonPlan.staticTopics[0].id)
 }
