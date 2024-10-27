@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LessonView: View {
-    let topicID: UUID
+    let topicID: Int
     @EnvironmentObject var viewModel: ApprenonsViewModel
     @State private var isLessonRead = false
     @State private var isQuizPassed = false
@@ -27,18 +27,27 @@ struct LessonView: View {
                 Text(topic.lessonText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
-                NavigationLink {
-                    QuizView(topicID: topicID)
-                } label: {
-                    Text("\(topic.title) Quiz")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                HStack {
+                    NavigationLink(value: NavigationState.quiz(topicID)) {
+                        Text("\(topic.title) Quiz")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    if viewModel.progressForTopic(withID: topicID).quizPassed {
+                        Image(systemName: "trash")
+                            .padding()
+                            .background(Color.red)
+                            .foregroundStyle(.white)
+                            .cornerRadius(8)
+                            .onTapGesture {
+                                viewModel.updateProgress(for: topicID, keyPath: \.quizPassed, value: false)
+                            }
+                    }
                 }
-                NavigationLink {
-                    FlashcardsView(topicID: topicID)
-                } label: {
+         
+                NavigationLink(value: NavigationState.flashcards(topicID)) {
                     Text("\(topic.title) Flashcards")
                         .padding()
                         .background(Color.blue)
@@ -56,11 +65,5 @@ struct LessonView: View {
                  }
         }
         .padding()
-    }
-}
-
-#Preview {
-    NavigationStack {
-        LessonView(topicID: FrenchLessonPlan.staticTopics[0].id)
     }
 }

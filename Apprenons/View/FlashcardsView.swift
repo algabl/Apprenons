@@ -8,12 +8,12 @@
 import SwiftUI
 
 
-struct Constants {
-    static var cornerRadius: CGFloat = 10
-}
+
 
 struct FlashcardsView: View {
-    let topicID: UUID
+
+    
+    let topicID: Int
     @EnvironmentObject var viewModel: ApprenonsViewModel
 
     @State private var isFlashcardStudied = false
@@ -53,41 +53,71 @@ struct FlashcardsView: View {
 }
 
 struct FlashcardView: View {
+    private struct Constants {
+        static var cornerRadius: CGFloat = 10
+        static let aspectRatio: CGFloat = 5 / 3
+    }
+    
     let flashcardID: UUID
-    var topicID: UUID
+    var topicID: Int
     @EnvironmentObject var viewModel: ApprenonsViewModel
     
     var flashcard: Flashcard? {
         viewModel.flashcard(withID: flashcardID, in: topicID)
     }
     
+    @State private var isFlipped = false
+    
+    var isFaceUp: Bool {
+        flashcard?.isFaceUp ?? true
+    }
+
     var body: some View {
         ZStack {
             Group {
                 if let flashcard {
-                    if flashcard.isFaceUp {
-                        RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
-                        RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
-                        Text(flashcard.front)
-                            .font(.largeTitle)
-                    } else {
-                        RoundedRectangle(cornerRadius: Constants.cornerRadius).fill(.white)
-                        RoundedRectangle(cornerRadius: Constants.cornerRadius).stroke()
-                        Text(flashcard.back)
-                            .font(.largeTitle)
+                    ZStack {
+                        CardFace(text: flashcard.front)
+                            .opacity(isFlipped ? 0 : 1)
+                        CardFace(text: flashcard.back)
+                            .opacity(isFlipped ? 1 : 0)
+                            .rotation3DEffect(.degrees(180), axis: (x: 0.0, y: 1.0, z: 0.0))
                     }
+                    .rotation3DEffect(
+                        .degrees(isFlipped ? 180 : 0),
+                        axis: (x: 0.0, y: 1.0, z: 0.0)
+                    )
                 }
            
             }
+            .aspectRatio(Constants.aspectRatio, contentMode: .fit)
            
         }
         .onTapGesture {
-            viewModel.flip(flashcardID, in: topicID)
+            withAnimation(.easeInOut(duration: 0.5)) {
+                isFlipped.toggle()
+                viewModel.flip(flashcardID, in: topicID)
+            }
         }
         .navigationTitle("Flashcards")
         .navigationBarTitleDisplayMode(.inline)
         .foregroundStyle(.blue)
      
+    }
+}
+
+struct CardFace: View {
+    let text: String
+    
+    var body: some View {
+        ZStack {
+          RoundedRectangle(cornerRadius: 10)
+              .fill(.white)
+          RoundedRectangle(cornerRadius: 10)
+              .stroke()
+          Text(text)
+              .font(.largeTitle)
+        }
     }
 }
 

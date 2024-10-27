@@ -8,7 +8,7 @@
 import Foundation
 
 struct Progress: Codable {
-    let topicID: UUID
+    let topicID: Int
     var lessonRead = false {
         didSet {
             saveToUserDefaults()
@@ -30,7 +30,7 @@ struct Progress: Codable {
         }
     }
     
-    init(topicID: UUID) {
+    init(topicID: Int) {
         self.topicID = topicID
         if let loadedProgress = Self.loadFromUserDefaults(topicID: topicID) {
             // If data exists, use it to initialize the properties
@@ -53,7 +53,7 @@ struct Progress: Codable {
         }
     }
     
-    static func loadFromUserDefaults(topicID: UUID) -> Progress? {
+    static func loadFromUserDefaults(topicID: Int) -> Progress? {
         guard let savedProgress = UserDefaults.standard.object(forKey: "\(Key.progress)_\(topicID)") as? Data else { return nil }
         let decoder = JSONDecoder()
         guard let loadedProgress = try?  decoder.decode(Progress.self, from: savedProgress) else { return nil }
@@ -67,7 +67,7 @@ struct Progress: Codable {
 }
 
 extension Progress:Identifiable {
-    var id: UUID {
+    var id: Int {
         topicID
     }
 }
