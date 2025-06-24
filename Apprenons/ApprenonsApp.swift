@@ -12,6 +12,7 @@ struct ApprenonsApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environmentObject(ApprenonsViewModel())
         }
     }
 }
